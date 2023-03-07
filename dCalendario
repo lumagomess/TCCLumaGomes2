@@ -1,0 +1,17 @@
+let
+DataInicial = #date(2016,1,1),
+DataFinal = #date(2017,12,31),
+QtdeDias = Duration.Days(DataFinal - DataInicial)+1,
+ListaDatas = List.Dates(DataInicial, QtdeDias, #duration(1,0,0,0)),
+    #"Convertido para Tabela" = Table.FromList(ListaDatas, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Tipo Alterado" = Table.TransformColumnTypes(#"Convertido para Tabela",{{"Column1", type date}}),
+    #"Colunas Renomeadas" = Table.RenameColumns(#"Tipo Alterado",{{"Column1", "Lista"}}),
+    #"Ano Inserido" = Table.AddColumn(#"Colunas Renomeadas", "Ano", each Date.Year([Lista]), Int64.Type),
+    #"Nome do Mês Inserido" = Table.AddColumn(#"Ano Inserido", "Nome do Mês", each Date.MonthName([Lista]), type text),
+    #"Nome do Dia Inserido" = Table.AddColumn(#"Nome do Mês Inserido", "Nome do Dia", each Date.DayOfWeekName([Lista]), type text),
+    #"Semana do Ano Inserida" = Table.AddColumn(#"Nome do Dia Inserido", "Semana do Ano", each Date.WeekOfYear([Lista]), Int64.Type),
+    #"Mês Inserido" = Table.AddColumn(#"Semana do Ano Inserida", "Mês", each Date.Month([Lista]), Int64.Type),
+    #"Dia da Semana Inserido" = Table.AddColumn(#"Mês Inserido", "Dia da Semana", each Date.DayOfWeek([Lista]), Int64.Type),
+    #"Colunas Renomeadas1" = Table.RenameColumns(#"Dia da Semana Inserido",{{"Lista", "Data"}})
+in
+    #"Colunas Renomeadas1"
